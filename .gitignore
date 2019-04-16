@@ -17,3 +17,7 @@ tmp
 html
 .*.sw?
 Gemfile.lock
+.idea/*
+.idea/emacs.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/emacs.xml

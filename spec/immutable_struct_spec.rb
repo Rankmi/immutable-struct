@@ -290,5 +290,17 @@ describe ImmutableStruct do
         expect(set.add?(@k2_a)).not_to be nil
       end
     end
+
+    describe 'empty?' do
+      it 'should respond to empty? ' do
+        klass = ImmutableStruct.new(:attr).new(attr:'xy')
+        expect(klass.respond_to?(:empty?)).to eq(true)
+        result = ImmutableStruct.new(:attr).new(attr:'xy').empty?
+        expect(result).to be(false)
+        result = ImmutableStruct.new(:attr).new(attr:nil).empty?
+        expect(result).to be(true)
+      end
+
+    end
   end
 end
