@@ -6,7 +6,7 @@
 # will be evaluated as if it were inside a class definition, allowing you
 # to add methods, include or extend modules, or do whatever else you want.
 class ImmutableStruct
-  VERSION = '2.4.1' #:nodoc:
+  VERSION='2.4.0' #:nodoc:
   # Create a new class with the given read-only attributes.
   #
   # attributes:: list of symbols or strings that can be used to create attributes.
@@ -56,7 +56,7 @@ class ImmutableStruct
   #   internals have no way to know about this.  This is particularly a problem if you want to
   #   define your own `to_json` method that serializes the result of `to_h`.
   #
-  def self.new(*attributes, &block)
+  def self.new(*attributes,&block)
     klass = Class.new do
       attributes.each do |attribute|
         if attribute.to_s =~ /(^.*)\?$/
@@ -71,19 +71,11 @@ class ImmutableStruct
           attr_reader attribute
         end
       end
-      define_method(:empty?) do
-        attributes.each do |attribute|
-          next if !self.send(attribute).respond_to?(:empty?)
-          return false unless self.send(attribute)&.empty?
-        end
-        return true
-      end
+
       define_singleton_method(:from) do |value|
         case value
-        when self then
-          value
-        when Hash then
-          new(value)
+        when self then value
+        when Hash then new(value)
         else
           raise ArgumentError, "cannot coerce #{value.class} #{value.inspect} into #{self}"
         end
@@ -96,7 +88,7 @@ class ImmutableStruct
             ivar_name = attribute[0].to_s
             instance_variable_set("@#{ivar_name}", (attrs[ivar_name.to_s] || attrs[ivar_name.to_sym]).to_a)
           else
-            ivar_name = attribute.to_s.gsub(/\?$/, '')
+            ivar_name = attribute.to_s.gsub(/\?$/,'')
             attr_value = attrs[ivar_name.to_s].nil? ? attrs[ivar_name.to_sym] : attrs[ivar_name.to_s]
             instance_variable_set("@#{ivar_name}", attr_value)
           end
@@ -132,9 +124,9 @@ class ImmutableStruct
     end
     klass.class_exec(&block) unless block.nil?
 
-    imethods = klass.instance_methods(include_super = false).map {|method_name|
+    imethods = klass.instance_methods(include_super=false).map { |method_name|
       klass.instance_method(method_name)
-    }.reject {|method|
+    }.reject { |method|
       method.arity != 0
     }.map(&:name).map(&:to_sym)
 
